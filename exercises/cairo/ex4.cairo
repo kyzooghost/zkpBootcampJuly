@@ -1,7 +1,10 @@
-## I AM NOT DONE
-
 ## Return summation of every number below and up to including n
 func calculate_sum(n : felt) -> (sum : felt): 
-    return(1)
+    if n == 1:
+        return(1)
+    end
+
+    let (sum) = calculate_sum(n - 1)
+    return(n + sum)
 end
 
