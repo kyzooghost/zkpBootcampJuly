@@ -8,6 +8,5 @@ end
 
 func add_one_U256{range_check_ptr}(y : Uint256) -> (val : Uint256):
    let (sum, carry) = uint256_add(y, Uint256(1, 0))
-   assert carry = 0
    return (sum)  
 end
