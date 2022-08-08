@@ -1,5 +1,3 @@
-## I AM NOT DONE
-
 from starkware.cairo.common.math import abs_value
 
 ## Implement a funcion that returns: 

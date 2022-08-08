@@ -1,7 +1,5 @@
-## I AM NOT DONE
-
-%builtins output range_check
-from starkware.cairo.common.serialize import serialize_word
+%builtins range_check
+# from starkware.cairo.common.serialize import serialize_word
 
 ## Perform and log output of simple arithmetic operations
 func simple_math{range_check_ptr}():
