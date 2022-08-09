@@ -133,7 +133,7 @@ export async function run() {
   try {
     const tx4 = await Mina.transaction(playerAcc, () => {
       zkAppInstance.guessMultiplied(Field(usersGuess), Field(multipliedValue));
-      let userParty = Party.createUnsigned(playerAcc.toPublicKey());
+      let userParty = Party.createUnsigned(playerAcc.toPublicKey()); // createUnsigned has no private key, createSigned has private key and required to subInPlace
       userParty.balance.addInPlace(new UInt64(potValue));
       if (!doProofs) {
         zkAppInstance.sign(zkAppPrivkey);

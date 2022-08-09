@@ -40,12 +40,12 @@ export async function run() {
 
   const zkAppInstance = new MessageBoard(zkAppAddress);
   if (doProofs) {
-    await MessageBoard.compile(zkAppAddress);
+    await MessageBoard.compile(zkAppAddress); // Generate circuit => create verification key
   }
   //transaction to deploy the smart contract and init it's values
   const txn = await Mina.transaction(deployerAcc, () => {
-    Party.fundNewAccount(deployerAcc);
-    zkAppInstance.deploy({ zkappKey: zkAppPrivkey });
+    Party.fundNewAccount(deployerAcc); // Take funds from deployerAcc, then give 1 MINA funds to whatever account needs it in the tx.
+    zkAppInstance.deploy({ zkappKey: zkAppPrivkey }); // Deploy can occur in the smart contract
     zkAppInstance.setPermissions({
       ...Permissions.default(),
       editState: Permissions.proofOrSignature(),

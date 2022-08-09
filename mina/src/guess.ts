@@ -17,8 +17,10 @@ export class Guess extends SmartContract {
   @state(UInt64) pot = State<UInt64>();
 
   @method init(initialbalance: UInt64, ownerAddr: PublicKey, potValue: Field) {
+    // No mutex, can be called more than once
     this.ownerAddr.set(ownerAddr);
-    this.balance.addInPlace(initialbalance);
+    // Account balance is not a field element, but a Uint64
+    this.balance.addInPlace(initialbalance); // ? Transfer gas token to contract
     this.pot.set(new UInt64(potValue));
   }
 
