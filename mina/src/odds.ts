@@ -12,24 +12,15 @@ import {
   } from 'snarkyjs';
   
   export class Odds extends SmartContract {
-    @state(Bool) roundFinished = State<Bool>();
-    @state(Field) oddsLimit = State<Field>();
-    @state(Field) player1Commit = State<Field>();
-    @state(UInt64) pot = State<UInt64>();
     @state(PublicKey as any) player1 = State<PublicKey>();
     @state(PublicKey as any) player2 = State<PublicKey>();
-  
-    @method init(player1_: PublicKey, player2_: PublicKey, oddsLimit_: Field, depositAmount_: UInt64) {
-        // Make sure state variables not set yet
-        let player1_initial = this.player1.get();
-        let player2_initial = this.player1.get();
-        let oddsLimit_initial = this.oddsLimit.get();
-        let pot_initial = this.pot.get();
-        player1_initial.assertEquals(PublicKey.empty());
-        player2_initial.assertEquals(PublicKey.empty());
-        oddsLimit_initial.assertEquals(Field.zero);
-        pot_initial.assertEquals(UInt64.zero);
+    @state(Field) oddsLimit = State<Field>();
+    @state(UInt64) pot = State<UInt64>();
+    @state(Bool) roundFinished = State<Bool>();
+    @state(Field) player1Commit = State<Field>();
 
+    // Can't get any state variables before this tx? How to make sure it can only be called once?
+    @method init(player1_: PublicKey, player2_: PublicKey, oddsLimit_: Field, depositAmount_: UInt64) {        
         // Set state variables
         this.player1.set(player1_);
         this.player2.set(player2_);
