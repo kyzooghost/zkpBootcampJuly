@@ -9,7 +9,7 @@ const MINT_ADMIN = 0x00348f5537be66815eb7de63295fcb5d8b8b2ffe09bb712af4966db7cbb
 const TEST_ACC1 = 0x00348f5537be66815eb7de63295fcb5d8b8b2ffe09bb712af4966db7cbb04a95
 const TEST_ACC2 = 0x3fe90a1958bb8468fb1b62970747d8a00c435ef96cda708ae8de3d07f1bb56b
 
-from openzeppelin.token.erc721.interfaces.IERC721 import IERC721
+from exercises.contracts.erc721.IERC721 import IERC721
 from exercises.contracts.erc20.IERC20 import IErc20 as Erc20
 
 @external
@@ -53,10 +53,10 @@ func test_mint{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr
     %{stop_prank_callable = start_prank(ids.TEST_ACC1, ids.contract_address)%}   
 
     ## Transfer NFT from TEST_ACC1 to TEST_ACC2
-    # IERC721.transferFrom(contract_address=contract_address, from_ = TEST_ACC1, to = TEST_ACC2, tokenId = Uint256(0,0))    
+    IERC721.transferFrom(contract_address=contract_address, from_ = TEST_ACC1, to = TEST_ACC2, tokenId = Uint256(0,0))    
     %{ stop_prank_callable() %}           
 
-    ## Check the counter increases afte two mints
+    ## Check the counter increases after two mints
     let (current_counter) = IERC721.getCounter(contract_address=contract_address)
     assert current_counter.low = 2 
 

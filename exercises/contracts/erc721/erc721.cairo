@@ -5,10 +5,29 @@
 
 %lang starknet
 from starkware.cairo.common.cairo_builtins import HashBuiltin
+from starkware.cairo.common.math import assert_le_felt
 from starkware.cairo.common.uint256 import Uint256
-from openzeppelin.access.ownable import Ownable
-from openzeppelin.introspection.ERC165 import ERC165
+from starkware.starknet.common.syscalls import get_caller_address, get_contract_address
+from openzeppelin.access.ownable.library import Ownable
+from openzeppelin.introspection.erc165.library import ERC165
 from openzeppelin.token.erc721.library import ERC721
+from exercises.contracts.erc20.IERC20 import IErc20
+
+#
+# Storage variables
+#
+
+@storage_var
+func totalSupply() -> (totalSupply: felt):
+end
+
+@storage_var
+func originalOwner(tokenId: Uint256) -> (originalOwner: felt):
+end
+
+@storage_var
+func ERC20_PAY() -> (ERC20_PAY_ADDRESS: felt):
+end
 
 #
 # Constructor
@@ -182,11 +201,23 @@ func mint{
         pedersen_ptr: HashBuiltin*,
         syscall_ptr: felt*,
         range_check_ptr
-    }(to: felt, tokenId: Uint256):
+    }(to: felt):
     Ownable.assert_only_owner()
+    _mint(to)
+    return ()
+end
 
+func _mint{
+        pedersen_ptr: HashBuiltin*,
+        syscall_ptr: felt*,
+        range_check_ptr
+    }(to: felt):
+    let (total_supply) = totalSupply.read()
     ## Add original hash
+    let tokenId = Uint256(total_supply, 0)
     ERC721._mint(to, tokenId)
+    totalSupply.write(total_supply + 1)
+    originalOwner.write(tokenId, to)
     return ()
 end
 
@@ -229,5 +260,57 @@ func renounceOwnership{
         range_check_ptr
     }():
     Ownable.renounce_ownership()
+    return ()
+end
+
+@view
+func getCounter{
+        syscall_ptr: felt*,
+        pedersen_ptr: HashBuiltin*,
+        range_check_ptr
+    }() -> (counter: Uint256):
+    let (counter) = totalSupply.read()
+    return (Uint256(counter, 0))
+end
+
+@view
+func getOriginalOwner{
+        syscall_ptr: felt*,
+        pedersen_ptr: HashBuiltin*,
+        range_check_ptr
+    }(tokenId: Uint256) -> (originalOwner: felt):
+    let (original_owner) = originalOwner.read(tokenId)
+    return (original_owner)
+end
+
+@external
+func setErc20_pay{
+        syscall_ptr: felt*,
+        pedersen_ptr: HashBuiltin*,
+        range_check_ptr
+    }(address: felt):
+    ERC20_PAY.write(address)
+    return ()
+end
+
+@external
+func mintBuy{
+        syscall_ptr: felt*,
+        pedersen_ptr: HashBuiltin*,
+        range_check_ptr
+    }():
+    let (caller) = get_caller_address()
+    let (erc20_address) = ERC20_PAY.read()
+    _mint(caller)
+
+    let (caller_balance) = IErc20.balanceOf(contract_address=erc20_address, account=caller)
+    assert_le_felt(2500, caller_balance.low)
+
+    # let (contract_address) = get_contract_address()
+    # let (transfer_res) = IErc20.transfer(contract_address=erc20_address,
+    #                     recipient=contract_address,
+    #                     amount=Uint256(100,0))
+
+    # IErc20.transfer(contract_address=erc20_address, recipient=1, amount=Uint256(2500,0))
     return ()
 end
